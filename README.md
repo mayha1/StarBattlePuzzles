@@ -7,6 +7,9 @@ Consider a $5\times 5$ one-star game map as above. Let $T[i][j] = 0$ if there ar
 
 * **2 stars cannot be adjacent horizontally, vertically or diagonally.**
 
-    For two adjacent cells, their sum must not exceed one. Therefore $T[i][j] + T[i][j + 1] \le 1$ for $i\in[0;4]$ and $j\in[0;3]$, $T[i][j] + T[i + 1][j] \le 1$ for $i\in[0;3]$ and $j\in[0;4]$, $T[i][j] + T[i + 1][j + 1] \le 1$ and $T[i + 1][j] + T[i][j + 1] \le 1$ for $i\in[0;3]$ and $j\in[0;3]$.
+    For two adjacent cells, their sum must not exceed one. Therefore
+    * $T[i][j] + T[i][j + 1] \le 1$ for $i\in[0;4]$ and $j\in[0;3]$ (horizontal adjacency);
+    * $T[i][j] + T[i + 1][j] \le 1$ for $i\in[0;3]$ and $j\in[0;4]$ (vertical adjacency);
+    * $T[i][j] + T[i + 1][j + 1] \le 1$ and $T[i + 1][j] + T[i][j + 1] \le 1$ for $i\in[0;3]$ and $j\in[0;3]$ (diagonal adjacency).
 
 * **You have to place 1 star on each row, column and shape.**
