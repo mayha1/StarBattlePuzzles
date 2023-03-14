@@ -4,22 +4,22 @@ import numpy as np
 
 
 def get_board():
-    n = int(input("Enter the size (also the region): "))
-    board = [0]*n
+    n = int(input("Enter the size (also the length and width): "))
+    board = [0] * n
     for i in range(n):
         board[i] = []
-        t = int(input("Enter the number of cells in region: "))
+        ncell = int(input("Enter the number of cells in region: "))
         print(".......")
         print("Now it comes to enter the coordinates of cells")
         
-        for j in range(t):
+        for j in range(ncell):
             t = []
-            x = int(input("Enter the x-coordinate of the cell: "))
+            x, y = map(int, input("Enter the x- and y-coordinate of the cell: ").split())
             t.append(x)
-            y = int(input("Enter the y-coordinate of the cell: "))
             t.append(y)
             board[i].append(t)
-            print("Next cell")
+            if (j != ncell - 1):
+                print("Next cell")
         
     return n, board
 
@@ -28,6 +28,8 @@ model = gp.Model('StarBattle')
 n, K = get_board()
 print(n, K)
 
+#n = 4
+#K = [[[0, 0], [0, 1], [1, 0], [1, 1]], [[2, 0], [2, 1], [3, 0], [3, 1]], [[0, 2], [0, 3], [1, 2], [1, 3]], [[2, 2], [2, 3], [3, 2], [3, 3]]]
 
 T = model.addMVar(shape = (n, n), lb = 0, ub = 1, vtype = GRB.INTEGER, name = "fool" )
 
@@ -70,17 +72,22 @@ print(f'model runtime: {model.runtime}')
 
 values = model.getAttr("X", model.getVars())
 #for i in range(n**2):
-    #if i % (n-1) == 0 and i != 0:
-        #print(values[i])
-    #print(values[i], end = " ")
-    
-print(values)
-    
-    
-        
+#    if i % (n-1) == 0 and i != 0:
+#        print(values[i])
+#    print(values[i], end = " ")
+for k in range (2 * n + 1):
+    print("-", end = "")
+print("")
+for i in range(n):
+    print("|", end = "")
+    for j in range(n):
+        if (int(values[i * n + j]) == 1):
+            print("*", end = "|")
+        else:
+            print(" ", end = "|")
+    print("")
+    for k in range (2 * n + 1):
+        print("-", end = "")
+    print("")
 
-
-
-
-            
-        
+#print(values)
