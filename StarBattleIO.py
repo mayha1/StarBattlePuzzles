@@ -4,7 +4,7 @@ import numpy as np
 import sys
 
 def get_board():
-    n = int(input("Enter the size (also the length and width): "))
+    n, s = map(int, input("Enter the size (also the length and width) and the number of stars in one region: ").split())
     board = [0] * n
     for i in range(n):
         board[i] = []
@@ -21,12 +21,12 @@ def get_board():
             if (j != ncell - 1):
                 print("Next cell")
         
-    return n, board
+    return n, s, board
 
 model = gp.Model('StarBattle')
 
-sys.stdin = open("GameBoard/6099519.in", "r")
-n, K = get_board()
+sys.stdin = open("GameBoard/WP-2023-2.txt", "r")
+n, s, K = get_board()
 #print(n, K)
 
 T = model.addMVar(shape = (n, n), lb = 0, ub = 1, vtype = GRB.INTEGER, name = "fool" )
@@ -36,14 +36,14 @@ for i in range(n):
     constraint = 0
     for j in range(n):
         constraint += T[i][j]
-    model.addConstr(constraint == 1)
+    model.addConstr(constraint == s)
 
 #sum of numbers in each columns must be 1
 for i in range(n):
     constraint = 0
     for j in range(n):
         constraint += T[j][i]
-    model.addConstr(constraint == 1)
+    model.addConstr(constraint == s)
 #sum of numbers in the adjacent cells <= 1
 
 for i in range(n-1):
@@ -56,7 +56,7 @@ for i in range(n):
     constraint = 0
     for j in range(len(K[i])):
         constraint += T[K[i][j][0]][K[i][j][1]]
-    model.addConstr(constraint == 1)
+    model.addConstr(constraint == s)
         
         
 model.setObjective(T[0][0], sense = GRB.MAXIMIZE)
