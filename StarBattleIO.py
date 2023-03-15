@@ -1,7 +1,7 @@
 import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
-
+import sys
 
 def get_board():
     n = int(input("Enter the size (also the length and width): "))
@@ -25,11 +25,9 @@ def get_board():
 
 model = gp.Model('StarBattle')
 
+sys.stdin = open("GameBoard/6099519.in", "r")
 n, K = get_board()
-print(n, K)
-
-#n = 4
-#K = [[[0, 0], [0, 1], [1, 0], [1, 1]], [[2, 0], [2, 1], [3, 0], [3, 1]], [[0, 2], [0, 3], [1, 2], [1, 3]], [[2, 2], [2, 3], [3, 2], [3, 3]]]
+#print(n, K)
 
 T = model.addMVar(shape = (n, n), lb = 0, ub = 1, vtype = GRB.INTEGER, name = "fool" )
 
@@ -75,18 +73,18 @@ values = model.getAttr("X", model.getVars())
 #    if i % (n-1) == 0 and i != 0:
 #        print(values[i])
 #    print(values[i], end = " ")
-for k in range (2 * n + 1):
+for k in range (4 * n + 1):
     print("-", end = "")
 print("")
 for i in range(n):
     print("|", end = "")
     for j in range(n):
         if (int(values[i * n + j]) == 1):
-            print("*", end = "|")
+            print(" * ", end = "|")
         else:
-            print(" ", end = "|")
+            print("   ", end = "|")
     print("")
-    for k in range (2 * n + 1):
+    for k in range (4 * n + 1):
         print("-", end = "")
     print("")
 
