@@ -2,43 +2,45 @@ import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
 import sys
+import os
 
 def get_board():
     n, s = map(int, input("Enter the size (also the length and width) and the number of stars in one region: ").split())
-    board = [0] * n
+    board = []
     for i in range(n):
-        board[i] = []
+        region = []
         ncell = int(input("Enter the number of cells in region: "))
         print(".......")
         print("Now it comes to enter the coordinates of cells")
         
         for j in range(ncell):
-            t = []
             x, y = map(int, input("Enter the x- and y-coordinate of the cell: ").split())
-            t.append(x)
-            t.append(y)
-            board[i].append(t)
+            region.append([x, y])
             if (j != ncell - 1):
                 print("Next cell")
         
+        board.append(region)
+
     return n, s, board
 
 model = gp.Model('StarBattle')
 
-sys.stdin = open("GameBoard/WP-2023-2.txt", "r")
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+print(os.getcwd())
+sys.stdin = open("./GameBoard/Sample.txt", "r")
 n, s, K = get_board()
 #print(n, K)
 
 T = model.addMVar(shape = (n, n), lb = 0, ub = 1, vtype = GRB.INTEGER, name = "fool" )
 
-#sum of numbers in each rows must be 1
+#sum of numbers in each rows must be s
 for i in range(n):
     constraint = 0
     for j in range(n):
         constraint += T[i][j]
     model.addConstr(constraint == s)
 
-#sum of numbers in each columns must be 1
+#sum of numbers in each columns must be s
 for i in range(n):
     constraint = 0
     for j in range(n):
