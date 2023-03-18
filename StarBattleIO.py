@@ -5,9 +5,9 @@ import sys
 import os
 
 def get_board():
-    n, s = map(int, input("Enter the size (also the length and width) and the number of stars in one region: ").split())
+    size_of_board, num_stars_reg = map(int, input("Enter the size (also the length and width) and the number of stars in one region: ").split())
     board = []
-    for i in range(n):
+    for i in range(size_of_board):
         region = []
         ncell = int(input("Enter the number of cells in region: "))
         print(".......")
@@ -21,44 +21,44 @@ def get_board():
         
         board.append(region)
 
-    return n, s, board
+    return size_of_board, num_stars_reg, board
 
 model = gp.Model('StarBattle')
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 print(os.getcwd())
 sys.stdin = open("./GameBoard/Sample.txt", "r")
-n, s, K = get_board()
+size_of_board, num_stars_reg, K = get_board()
 #print(n, K)
 
-T = model.addMVar(shape = (n, n), lb = 0, ub = 1, vtype = GRB.INTEGER, name = "fool" )
+T = model.addMVar(shape = (size_of_board,size_of_board), lb = 0, ub = 1, vtype = GRB.INTEGER, name = "fool" )
 
 #sum of numbers in each rows must be s
-for i in range(n):
-    constraint = 0
-    for j in range(n):
-        constraint += T[i][j]
-    model.addConstr(constraint == s)
+for i in range(size_of_board):
+    sum_row = 0
+    for j in range(size_of_board):
+        sum_row += T[i][j]
+    model.addConstr(sum_row == num_stars_reg)
 
 #sum of numbers in each columns must be s
-for i in range(n):
-    constraint = 0
-    for j in range(n):
-        constraint += T[j][i]
-    model.addConstr(constraint == s)
+for i in range(size_of_board):
+    sum_col = 0
+    for j in range(size_of_board):
+        sum_col += T[j][i]
+    model.addConstr(sum_col == num_stars_reg)
 #sum of numbers in the adjacent cells <= 1
 
-for i in range(n-1):
-    for j in range(n-1):
+for i in range(size_of_board-1):
+    for j in range(size_of_board-1):
         model.addConstr(T[i][j]+T[i][j+1]+T[i+1][j]+T[i+1][j+1] <= 1)
         
 #sum of numbers in a region
 
-for i in range(n):
-    constraint = 0
+for i in range(size_of_board):
+    sum_reg = 0
     for j in range(len(K[i])):
-        constraint += T[K[i][j][0]][K[i][j][1]]
-    model.addConstr(constraint == s)
+        sum_reg += T[K[i][j][0]][K[i][j][1]]
+    model.addConstr(sum_reg == num_stars_reg)
         
         
 model.setObjective(T[0][0], sense = GRB.MAXIMIZE)
@@ -75,18 +75,18 @@ values = model.getAttr("X", model.getVars())
 #    if i % (n-1) == 0 and i != 0:
 #        print(values[i])
 #    print(values[i], end = " ")
-for k in range (4 * n + 1):
+for k in range (4 * size_of_board + 1):
     print("-", end = "")
 print("")
-for i in range(n):
+for i in range(size_of_board):
     print("|", end = "")
-    for j in range(n):
-        if (int(values[i * n + j]) == 1):
+    for j in range(size_of_board):
+        if (int(values[i * size_of_board + j]) == 1):
             print(" * ", end = "|")
         else:
             print("   ", end = "|")
     print("")
-    for k in range (4 * n + 1):
+    for k in range (4 * size_of_board + 1):
         print("-", end = "")
     print("")
 
