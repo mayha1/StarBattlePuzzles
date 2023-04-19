@@ -23,71 +23,82 @@ def get_board():
 
     return size_of_board, num_stars_reg, board
 
-model = gp.Model('StarBattle')
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-print(os.getcwd())
-sys.stdin = open("./GameBoard/Sample.txt", "r")
-size_of_board, num_stars_reg, K = get_board()
-#print(n, K)
-
-T = model.addMVar(shape = (size_of_board,size_of_board), lb = 0, ub = 1, vtype = GRB.INTEGER, name = "fool" )
 
 #sum of numbers in each rows must be s
-for i in range(size_of_board):
-    sum_row = 0
-    for j in range(size_of_board):
-        sum_row += T[i][j]
-    model.addConstr(sum_row == num_stars_reg)
+def sum_row(size_of_board, T, num_stars_reg):
+    for i in range(size_of_board):
+        sum_row = 0
+        for j in range(size_of_board):
+            sum_row += T[i][j]
+        model.addConstr(sum_row == num_stars_reg)
 
 #sum of numbers in each columns must be s
-for i in range(size_of_board):
-    sum_col = 0
-    for j in range(size_of_board):
-        sum_col += T[j][i]
-    model.addConstr(sum_col == num_stars_reg)
+def sum_column(size_of_board, T, num_stars_reg):
+    for i in range(size_of_board):
+        sum_col = 0
+        for j in range(size_of_board):
+            sum_col += T[j][i]
+        model.addConstr(sum_col == num_stars_reg)
 #sum of numbers in the adjacent cells <= 1
-
-for i in range(size_of_board-1):
-    for j in range(size_of_board-1):
-        model.addConstr(T[i][j]+T[i][j+1]+T[i+1][j]+T[i+1][j+1] <= 1)
+def sum_adj(size_of_board, T):
+    for i in range(size_of_board-1):
+        for j in range(size_of_board-1):
+            model.addConstr(T[i][j]+T[i][j+1]+T[i+1][j]+T[i+1][j+1] <= 1)
         
 #sum of numbers in a region
-
-for i in range(size_of_board):
-    sum_reg = 0
-    for j in range(len(K[i])):
-        sum_reg += T[K[i][j][0]][K[i][j][1]]
-    model.addConstr(sum_reg == num_stars_reg)
+def sum_reg(size_of_board, T, K, num_stars_reg):
+    for i in range(size_of_board):
+        sum_reg = 0
+        for j in range(len(K[i])):
+            sum_reg += T[K[i][j][0]][K[i][j][1]]
+        model.addConstr(sum_reg == num_stars_reg)
         
         
-model.setObjective(T[0][0], sense = GRB.MAXIMIZE)
 
-model.optimize()
-print('-' * 50)
-if model.status == GRB.OPTIMAL:
-    print('The status meaning is OPTIMAL')
-print(f'model status: {model.status}')
-print(f'model runtime: {model.runtime}')
-
-values = model.getAttr("X", model.getVars())
-#for i in range(n**2):
-#    if i % (n-1) == 0 and i != 0:
-#        print(values[i])
-#    print(values[i], end = " ")
-for k in range (4 * size_of_board + 1):
-    print("-", end = "")
-print("")
-for i in range(size_of_board):
-    print("|", end = "")
-    for j in range(size_of_board):
-        if (int(values[i * size_of_board + j]) == 1):
-            print(" * ", end = "|")
-        else:
-            print("   ", end = "|")
-    print("")
+def print_board(size_of_board, values):
     for k in range (4 * size_of_board + 1):
         print("-", end = "")
     print("")
+    for i in range(size_of_board):
+        print("|", end = "")
+        for j in range(size_of_board):
+            if (int(values[i * size_of_board + j]) == 1):
+                print(" * ", end = "|")
+            else:
+                print("   ", end = "|")
+        print("")
+        for k in range (4 * size_of_board + 1):
+            print("-", end = "")
+        print("")
 
 #print(values)
+
+if __name__ == "__main__":
+    model = gp.Model('StarBattle')
+
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    print(os.getcwd())
+    sys.stdin = open("WP-2023-2.txt", "r")
+    size_of_board, num_stars_reg, K = get_board()
+    #print(n, K)
+
+    T = model.addMVar(shape = (size_of_board,size_of_board), lb = 0, ub = 1, vtype = GRB.INTEGER, name = "fool" )
+    sum_row(size_of_board, T, num_stars_reg)
+    sum_column(size_of_board, T, num_stars_reg)
+    sum_adj(size_of_board, T)
+    sum_reg(size_of_board, T, K, num_stars_reg)
+    model.setObjective(T[0][0], sense = GRB.MAXIMIZE)
+
+    model.optimize()
+    print('-' * 50)
+    if model.status == GRB.OPTIMAL:
+        print('The status meaning is OPTIMAL')
+    print(f'model status: {model.status}')
+    print(f'model runtime: {model.runtime}')
+
+    values = model.getAttr("X", model.getVars())
+    print_board(size_of_board, values)
+    
+    
+   
