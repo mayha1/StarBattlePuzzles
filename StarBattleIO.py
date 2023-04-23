@@ -3,8 +3,9 @@ from gurobipy import GRB
 import numpy as np
 import sys
 import os
+import json
 
-def get_board():
+"""def get_board():
     size_of_board, num_stars_reg = map(int, input("Enter the size (also the length and width) and the number of stars in one region: ").split())
     board = []
     for i in range(size_of_board):
@@ -21,6 +22,17 @@ def get_board():
         
         board.append(region)
 
+    return size_of_board, num_stars_reg, board"""
+
+def get_board_json():
+    f = open('file_thu.json')
+    data = json.load(f)
+    size_of_board = data["size_of_board"]
+    num_stars_reg = data["num_stars_per_region"]
+    board = []
+    region = data["region"]
+    for i in region.values():
+        board.append(i)
     return size_of_board, num_stars_reg, board
 
 
@@ -78,10 +90,10 @@ if __name__ == "__main__":
     model = gp.Model('StarBattle')
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    print(os.getcwd())
-    sys.stdin = open("WP-2023-2.txt", "r")
-    size_of_board, num_stars_reg, K = get_board()
-    #print(n, K)
+    #print(os.getcwd())
+    #sys.stdin = open("WP-2023-2.txt", "r")
+    size_of_board, num_stars_reg, K = get_board_json()
+    #print( K)
 
     T = model.addMVar(shape = (size_of_board,size_of_board), lb = 0, ub = 1, vtype = GRB.INTEGER, name = "fool" )
     sum_row(size_of_board, T, num_stars_reg)
