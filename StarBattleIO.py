@@ -22,7 +22,7 @@ import json
         
         board.append(region)
 
-    return size_of_board, num_stars_reg, board"""
+    return size_of_board, num_stars_reg, board""" #for txt file entry
 
 def get_board_json():
     f = open('file_thu.json')
@@ -89,7 +89,7 @@ def print_board(size_of_board, values):
 if __name__ == "__main__":
     model = gp.Model('StarBattle')
 
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    #os.chdir(os.path.dirname(os.path.abspath(__file__)))
     #print(os.getcwd())
     #sys.stdin = open("WP-2023-2.txt", "r")
     size_of_board, num_stars_reg, K = get_board_json()
